@@ -9,7 +9,7 @@ from deluge_client import DelugeRPCClient
 import logging
 from logging.config import fileConfig
 
-logpath = '/var/log/sickbeard_mp4_automator'
+logpath = './logs/deluge_convert'
 if os.name == 'nt':
     logpath = os.path.dirname(sys.argv[0])
 elif not os.path.isdir(logpath):
@@ -33,12 +33,12 @@ def main(argv):
     if len(argv) < 4:
         log.error("Not enough command line parameters present, are you launching this from deluge?")
         sys.exit()
-
+    
     path = str(argv[3])
     torrent_name = str(argv[2])
     torrent_id = str(argv[1])
     delete_dir = None
-
+    
     log.debug("Path: %s." % path)
     log.debug("Torrent: %s." % torrent_name)
     log.debug("Hash: %s." % torrent_id)
@@ -47,20 +47,20 @@ def main(argv):
     client.connect()
 
     if client.connected:
-        log.info("Successfully connected to Deluge")
+      log.info("Successfully connected to Deluge")
     else:
-        log.error("Failed to connect to Deluge")
-        sys.exit()
+      log.error("Failed to connect to Deluge")
+      sys.exit()
 
     torrent_data = client.call('core.get_torrent_status', torrent_id, ['files', 'label'])
-    torrent_files = torrent_data['files']
-    category = torrent_data['label'].lower()
+    torrent_files = torrent_data[b'files']
+    category = torrent_data[b'label'].lower().decode()
 
     files = []
     log.debug("List of files in torrent:")
     for contents in torrent_files:
-        files.append(contents['path'])
-        log.debug(contents['path'])
+        files.append(contents[b'path'].decode())
+        log.debug(contents[b'path'].decode())
 
     if category.lower() not in categories:
         log.error("No valid category detected.")
@@ -71,12 +71,12 @@ def main(argv):
         sys.exit()
 
     if settings.deluge['convert']:
-        # Check for custom Deluge output_dir
+    # Check for custom Deluge output_dir
         if settings.deluge['output_dir']:
             settings.output_dir = settings.deluge['output_dir']
             log.debug("Overriding output_dir to %s." % settings.deluge['output_dir'])
 
-        # Perform conversion.
+    # Perform conversion.
         settings.delete = False
         if not settings.output_dir:
             suffix = "convert"
@@ -109,15 +109,15 @@ def main(argv):
         path = newpath
         delete_dir = newpath
 
-    # Send to Sickbeard
+# Send to Sickbeard
     if (category == categories[0]):
         log.info("Passing %s directory to Sickbeard." % path)
         autoProcessTV.processEpisode(path, settings)
-    # Send to CouchPotato
+# Send to CouchPotato
     elif (category == categories[1]):
         log.info("Passing %s directory to Couch Potato." % path)
         autoProcessMovie.process(path, settings, torrent_name)
-    # Send to Sonarr
+# Send to Sonarr
     elif (category == categories[2]):
         log.info("Passing %s directory to Sonarr." % path)
         sonarr.processEpisode(path, settings)
