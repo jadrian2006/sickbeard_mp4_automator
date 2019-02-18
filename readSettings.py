@@ -136,12 +136,20 @@ class ReadSettings:
                            'apikey': '',
                            'ssl': 'False',
                            'web_root': ''}
+        # Default settings for Bonarr
+        bonarr_defaults = {'host': 'localhost',
+                           'port': '9999',
+                           'apikey': '',
+                           'ssl': 'False',
+                           'web_root': ''}
+
         # Default uTorrent settings
         utorrent_defaults = {'couchpotato-label': 'couchpotato',
                              'sickbeard-label': 'sickbeard',
                              'sickrage-label': 'sickrage',
                              'sonarr-label': 'sonarr',
                              'radarr-label': 'radarr',
+                             'bonarr-label': 'bonarr',
                              'bypass-label': 'bypass',
                              'convert': 'True',
                              'webui': 'False',
@@ -175,6 +183,7 @@ class ReadSettings:
                            'sickrage-label': 'sickrage',
                            'sonarr-label': 'sonarr',
                            'radarr-label': 'radarr',
+                           'bonarr-label': 'bonarr',
                            'bypass-label': 'bypass',
                            'convert': 'True',
                            'host': 'localhost',
@@ -190,7 +199,7 @@ class ReadSettings:
                          'refresh': 'true',
                          'token': ''}
 
-        defaults = {'SickBeard': sb_defaults, 'CouchPotato': cp_defaults, 'Sonarr': sonarr_defaults, 'Radarr': radarr_defaults, 'MP4': mp4_defaults, 'uTorrent': utorrent_defaults, 'SABNZBD': sab_defaults, 'Sickrage': sr_defaults, 'Deluge': deluge_defaults, 'Plex': plex_defaults}
+        defaults = {'SickBeard': sb_defaults, 'CouchPotato': cp_defaults, 'Sonarr': sonarr_defaults, 'Radarr': radarr_defaults, 'Bonarr': bonarr_defaults, 'MP4': mp4_defaults, 'uTorrent': utorrent_defaults, 'SABNZBD': sab_defaults, 'Sickrage': sr_defaults, 'Deluge': deluge_defaults, 'Plex': plex_defaults}
         write = False  # Will be changed to true if a value is missing from the config file and needs to be written
 
         config = configparser.SafeConfigParser()
@@ -578,6 +587,7 @@ class ReadSettings:
         self.deluge['sb'] = config.get(section, "sickbeard-label").lower()
         self.deluge['sr'] = config.get(section, "sickrage-label").lower()
         self.deluge['sonarr'] = config.get(section, "sonarr-label").lower()
+        self.deluge['bonarr'] = config.get(section, "bonarr-label").lower()
         self.deluge['radarr'] = config.get(section, "radarr-label").lower()
         self.deluge['bypass'] = config.get(section, "bypass-label").lower()
         try:
@@ -607,6 +617,19 @@ class ReadSettings:
             self.Sonarr['web_root'] = "/" + self.Sonarr['web_root']
         if self.Sonarr['web_root'].endswith("/"):
             self.Sonarr['web_root'] = self.Sonarr['web_root'][:-1]
+
+        # Read relevant Bonarr section information
+        section = "Bonarr"
+        self.Bonarr = {}
+        self.Bonarr['host'] = config.get(section, "host")
+        self.Bonarr['port'] = config.get(section, "port")
+        self.Bonarr['apikey'] = config.get(section, "apikey")
+        self.Bonarr['ssl'] = config.get(section, "ssl")
+        self.Bonarr['web_root'] = config.get(section, "web_root")
+        if not self.Bonarr['web_root'].startswith("/"):
+            self.Bonarr['web_root'] = "/" + self.Bonarr['web_root']
+        if self.Bonarr['web_root'].endswith("/"):
+            self.Bonarr['web_root'] = self.Bonarr['web_root'][:-1]
 
         # Read relevant Radarr section information
         section = "Radarr"

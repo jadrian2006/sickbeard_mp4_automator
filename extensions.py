@@ -14,3 +14,4 @@ subtitle_codec_extensions = {'srt': 'srt',
                              'ass': 'ass'}
 bad_post_files = ['resources', '.DS_Store']
 bad_post_extensions = ['.txt', '.log', '.pyc']
+bad_strings = ['sample.', '.duplicate','.sub','.sample', 'sample-','-sample']
